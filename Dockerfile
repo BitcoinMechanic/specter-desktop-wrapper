@@ -1,6 +1,6 @@
 ARG USER=specter
 ARG DIR=/data/
-ARG VERSION=v1.9.4
+ARG VERSION=v1.10.3
 ARG REPO=https://github.com/cryptoadvance/specter-desktop
 FROM python:3.9-slim-bullseye AS builder
 RUN apt update && apt install -y git build-essential libusb-1.0-0-dev libudev-dev libffi-dev libssl-dev
@@ -20,7 +20,6 @@ RUN pip3 install .
 FROM python:3.9-slim-bullseye AS final
 ARG USER
 ARG DIR
-LABEL maintainer="dread (specter-wrapper@bobodread.com)"
 RUN apt update && apt install -y libusb-1.0-0-dev libudev-dev wget
 RUN wget https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_arm.tar.gz -O - |\
     tar xz && mv yq_linux_arm /usr/bin/yq

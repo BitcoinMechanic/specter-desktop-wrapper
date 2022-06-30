@@ -3,7 +3,7 @@
 bitcoind:
   type: union
   name: Bitcoin Core
-  description: The Bitcoin Core node for Specter Desktop to connect to
+  description: The Bitcoin Core node for Specter to connect to
   tag:
     id: type
     name: Type
@@ -38,18 +38,18 @@ bitcoind:
       user:
         type: pointer
         name: RPC Username
-        description: The username for the RPC user allocated to Specter Desktop
+        description: The username for the RPC user allocated to Specter
         subtype: package
         package-id: btc-rpc-proxy
         target: config
         multi: false
-        selector: '$.users.[?(@.name == "specter-desktop")].name'
+        selector: '$.users.[?(@.name == "specter")].name'
       password:
         type: pointer
         name: RPC Password
-        description: The password for the RPC user allocated to Specter Desktop
+        description: The password for the RPC user allocated to Specter
         subtype: package
         package-id: btc-rpc-proxy
         target: config
         multi: false
-        selector: '$.users.[?(@.name == "specter-desktop")].password'
+        selector: '$.users.[?(@.name == "specter")].password'

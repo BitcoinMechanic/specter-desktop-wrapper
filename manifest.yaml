@@ -1,20 +1,21 @@
-id: specter-desktop 
-title: Specter Desktop
-version: 1.9.4.1
-release-notes: Initial version for EmbassyOS v0.3.0.3
+id: specter 
+title: Specter
+version: 1.10.3
+release-notes: Initial version for EmbassyOS v0.3.1
+eos-version: 0.3.1
 license: mit
-wrapper-repo: https://github.com/cryptodread/specter-desktop-wrapper
+wrapper-repo: https://github.com/Start9Labs/specter-wrapper
 upstream-repo: https://github.com/cryptoadvance/specter-desktop
 support-site: https://github.com/cryptoadvance/specter-desktop/issues
 marketing-site: https://specter.solutions
 build: ["make"]
 description:
-  short: A desktop GUI for Bitcoin Core optimised to work with hardware wallets 
-  long: A desktop GUI for Bitcoin Core optimised to work with hardware wallets. This software might be ready to be used but at your own risk. 
+  short: A user-friendly web GUI for Bitcoin Core with a focus on multisignature setup using hardware wallets and airgapped devices.
+  long: Bitcoin Core has a very powerful command line interface and a wonderful daemon. Using PSBT and HWI it also works great with hardware wallets, but at the moment this is beyond most users. The same applies to multisignature setups. The goal of this project is to make a convenient and user-friendly GUI around Bitcoin Core with a focus on multisignature setup with hardware wallets and airgapped devices.
 assets:
   license: LICENSE
   icon: icon.png
-  instructions: docs/instructions.md
+  instructions: instructions.md
   docker-images: image.tar
 main:
   type: docker
@@ -29,44 +30,29 @@ main:
 health-checks:
   main:
     name: Web Interface
-    success-message: The Specter Desktop UI is ready to visit in a web browser
+    success-message: The Specter UI is ready to visit in a web browser
     type: docker
     image: main
     entrypoint: check-web.sh
     args: []
     io-format: json
     inject: true
+#  synced:
+#    name: Bitcoin Synced
+#    success-message: Bitcoin is fully indexed.
+#    type: docker
+#    image: main
+#    system: false
+#    entrypoint: check-synced.sh
+#    args: ["sync"]
+#    mounts: {}
+#    io-format: json
+#    inject: true  
 config:
   get:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - get
-      - /root
-      - /mnt/assets/config_spec.yaml
-    mounts:
-      main: /root
-      compat: /mnt/assets
-    io-format: yaml
+    type: script
   set:
-    type: docker
-    image: compat
-    system: true
-    entrypoint: compat
-    args:
-      - config
-      - set
-      - specter-desktop
-      - /root
-      - /mnt/assets/config_rules.yaml
-#      - /mnt/assets/dependencies.yaml
-    mounts:
-      main: /root
-      compat: /mnt/assets
-    io-format: yaml
+    type: script
 #properties:
 #  type: docker
 #  image: compat
@@ -93,8 +79,8 @@ volumes:
     readonly: false
 interfaces:
   main:
-    name: Specter Desktop Web Interface
-    description: Specifies the Specter Desktop interface to listen on for HTTP connections.
+    name: Specter Web Interface
+    description: Specifies the Specter interface to listen on for HTTP connections.
     tor-config:
       port-mapping:
         80: "25441"
@@ -122,7 +108,7 @@ dependencies:
         args:
           - dependency
           - check
-          - specter-desktop
+          - specter
           - "btc-rpc-proxy"
           - /root
           - "/mnt/assets/btc-rpc-proxy_config_rules.yaml"
@@ -138,7 +124,7 @@ dependencies:
         args:
           - dependency
           - "auto-configure"
-          - specter-desktop
+          - specter
           - "btc-rpc-proxy"
           - /root
           - "/mnt/assets/btc-rpc-proxy_config_rules.yaml"
@@ -147,44 +133,16 @@ dependencies:
           compat: /mnt/assets
         io-format: yaml
   bitcoind:
-    version: ">=0.22.0.0 <=23.0.0"
+    version: ">=23.0.0 <24.0.0"
     requirement:
       type: "required"
       how: Can alternatively configure proxy or bitcoin core node.
     description: Used to subscribe to new block events from a full archival node.
     config:
       check: 
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - check
-          - "specter-desktop"
-          - bitcoind
-          - /root
-          - "/mnt/assets/bitcoind_config_rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /root
-        io-format: yaml
+        type: script
       auto-configure:
-        type: docker
-        image: compat
-        system: true
-        entrypoint: compat
-        args:
-          - dependency
-          - "auto-configure"
-          - "specter-desktop"
-          - bitcoind
-          - /root
-          - "/mnt/assets/bitcoind_config_rules.yaml"
-        mounts:
-          compat: /mnt/assets
-          main: /root
-        io-format: yaml
+        type: script
 backup:
   create:
     type: docker

@@ -1,12 +1,14 @@
-# Wrapper for Specter Desktop
+# Wrapper for specter
 
-`Specter Desktop` is a desktop GUI for Bitcoin Core optimised to work with hardware wallets . This .s9pk wrapper will allow you to run Specter Desktop on your Embassy.
+Specter is a GUI for Bitcoin Core optimized to work with hardware wallets. This repository creates the `s9pk` package that is installed to run `specter` on [embassyOS](https://github.com/Start9Labs/embassy-os/).
 
 ## Embassy Service Pre-Requisites: 
 
 - [Bitcoin Core](https://github.com/Start9Labs/bitcoind-wrapper)
 
 ## Dependencies
+
+The following set of dependencies are required to build this project. You can find detailed steps to setup your environment below, and in the service packaging [documentation](https://github.com/Start9Labs/service-pipeline#development-environment).
 
 - [docker](https://docs.docker.com/get-docker)
 - [docker-buildx](https://docs.docker.com/buildx/working-with-buildx/)
@@ -15,8 +17,8 @@
 - [embassy-sdk](https://github.com/Start9Labs/embassy-os/tree/master/backend)
 - [make](https://www.gnu.org/software/make/)
 
-## Build enviroment
-Prepare your EmbassyOS build enviroment. In this example we are using Ubuntu 20.04.
+## Build environment
+Prepare your embassyOS build environment. In this example we are using Ubuntu 20.04.
 
 1. Install docker
 ```
@@ -60,34 +62,42 @@ cd embassy-os/backend/
 
 ## Cloning
 
-Clone the project locally. Note the submodule link to the original project(s). 
+Clone the project locally. Note the submodule link to the original project. 
 
 ```
-git clone https://github.com/Start9Labs/specter-desktop-wrapper.git
-cd specter-desktop-wrapper
+git clone https://github.com/Start9Labs/specter-wrapper.git
+cd specter-wrapper
 git submodule update --init --recursive
 ```
 ## Building
 
-To build the project, run the following commands:
+To build the `specter` package, run the following command:
 
 ```
 make
 ```
 
-## Installing (on Embassy)
+## Installing (on embassyOS)
 
-SSH into an Embassy device.
-`scp` the `.s9pk` to any directory from your local machine.
-Run the following command to install the package:
+Run the following commands to determine successful install:
+> :information_source: Change embassy-server-name.local to your Embassy address
 
 ```
 embassy-cli auth login
-#Enter your embassy password then run:
-embassy-cli package install /path/to/specter-desktop.s9pk
+# Enter your embassy password
+embassy-cli --host https://embassy-server-name.local package install specter.s9pk
 ```
-## Verify Install
 
-Go to your Embassy Services page, select specter-desktop and start the service.
+If you already have your `embassy-cli` config file setup with a default `host`, you can install simply by running:
+
+```
+make install
+```
+
+> **Tip:** You can also install the specter.s9pk using **Sideload Service** under the **Embassy > Settings** section.
+
+### Verify Install
+
+Go to your Embassy Services page, select **Specter**, configure and start the service. Then, verify its interfaces are accessible.
 
 #Done

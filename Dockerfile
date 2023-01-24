@@ -1,29 +1,27 @@
 ARG USER=specter
 ARG DIR=/data/
-ARG VERSION=v1.9.4
-ARG REPO=https://github.com/cryptoadvance/specter-desktop
-FROM python:3.9-slim-bullseye AS builder
+ARG VERSION=v1.14.5
+
+FROM python:3.9-slim AS builder
+
 RUN apt update && apt install -y git build-essential libusb-1.0-0-dev libudev-dev libffi-dev libssl-dev
 ARG VERSION
-ARG REPO
-WORKDIR /
-RUN git clone $REPO 
-WORKDIR /specter-desktop
-#RUN git pull
-#COPY specter-desktop/ .
-RUN git checkout $VERSION
+WORKDIR /build
+COPY specter-desktop/ .
 RUN sed -i "s/vx.y.z-get-replaced-by-release-script/${VERSION}/g; " setup.py
 RUN pip3 install --upgrade pip
 RUN pip3 install babel cryptography
 RUN pip3 install .
 
-FROM python:3.9-slim-bullseye AS final
+FROM python:3.9-slim AS final
+
+# arm64 or amd64
+ARG PLATFORM
 ARG USER
 ARG DIR
-LABEL maintainer="dread (specter-wrapper@bobodread.com)"
 RUN apt update && apt install -y libusb-1.0-0-dev libudev-dev wget
-RUN wget https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_arm.tar.gz -O - |\
-    tar xz && mv yq_linux_arm /usr/bin/yq
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_${PLATFORM}.tar.gz -O - |\
+    tar xz && mv yq_linux_${PLATFORM} /usr/bin/yq
 # NOTE: Default GID == UID == 1000
 RUN adduser --disabled-password \
             --home "$DIR" \
@@ -42,8 +40,6 @@ USER root
 # Import Entrypoint and give permissions
 ADD ./docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 RUN chmod a+x /usr/local/bin/docker_entrypoint.sh
-ADD assets/utils/check-web.sh /usr/local/bin/check-web.sh
-RUN chmod +x /usr/local/bin/check-web.sh
 
 EXPOSE 25441 25442 25443
 
